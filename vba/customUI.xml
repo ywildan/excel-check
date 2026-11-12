@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  Ribbon customUI untuk Prototipe Audit Excel v0.1
+  CARA PASANG (setelah VBA diimpor, di Windows):
+    1. Tutup Excel. Ubah .xlsm jadi .zip, buka.
+    2. Tambahkan folder customUI/ berisi file ini sebagai customUI.xml
+    3. Di [Content_Types].xml tambahkan:
+       <Default Extension="xml" ContentType="application/xml"/>
+       <Override PartName="/customUI/customUI.xml"
+                 ContentType="application/vnd.ms-office.customUI"/>
+       (atau gunakan Custom UI Editor for Microsoft Office — lebih mudah)
+    4. Di _rels/.rels tambahkan relasi customUI.
+  Untuk prototipe cepat, langkah ini OPSIONAL: semua fungsi
+  juga bisa dijalankan dari Alt+F8 (Macro) dengan nama:
+    StartTracking, PauseTracking, ResumeTracking, FinishAndLock
+  Tombol di bawah memanggil prosedur di modAudit.bas.
+-->
+<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui">
+  <ribbon>
+    <tabs>
+      <tab id="tabAudit" label="Tugas Akuntansi">
+        <group id="grpAudit" label="Audit Pengerjaan">
+          <button id="btnMulai" label="Mulai" size="large"
+                  imageMso="StartTimer" onAction="Ribbon_Mulai"/>
+          <button id="btnJeda" label="Jeda / Lanjut" size="large"
+                  imageMso="Pause" onAction="Ribbon_Jeda"/>
+          <button id="btnSelesai" label="Selesai &amp; Kunci" size="large"
+                  imageMso="Lock" onAction="Ribbon_Selesai"/>
+          <button id="btnLog" label="Lihat Log" size="large"
+                  imageMso="ViewLog" onAction="Ribbon_LihatLog"/>
+          <button id="btnReset" label="Reset Demo" size="large"
+                  imageMso="Reset" onAction="Ribbon_ResetDemo"/>
+        </group>
+        <group id="grpInfo" label="Info">
+          <labelControl id="lblInfo" label="Timer jalan hanya saat aktif. Diam &gt; 5 detik = jeda."/>
+        </group>
+      </tab>
+    </tabs>
+  </ribbon>
+</customUI>
