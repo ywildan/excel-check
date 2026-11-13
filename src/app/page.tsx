@@ -36,6 +36,25 @@ const mahasiswaSteps = [
   },
 ];
 
+const useCases = [
+  {
+    title: "Memeriksa kelas besar",
+    body: "Tarik banyak file sekaligus, lihat ringkasan kelas, lalu buka detail hanya pada file yang perlu ditinjau.",
+  },
+  {
+    title: "Menemukan indikasi salinan",
+    body: "Isi pekerjaan yang identik dan author yang sama ditandai otomatis, tanpa membandingkan file satu per satu.",
+  },
+  {
+    title: "Memastikan tracker dipakai",
+    body: "File tanpa _AUDIT_LOG atau properti Audit_* langsung ditandai TANPA LOG.",
+  },
+  {
+    title: "Menyimpan riwayat pemeriksaan",
+    body: "Jika masuk dengan Google, ringkasan tersimpan dan bisa dibuka lagi dari perangkat lain.",
+  },
+];
+
 const faqs = [
   {
     q: "Apakah file mahasiswa diunggah ke server?",
@@ -188,6 +207,57 @@ export default function HomePage() {
               <a className="btn btn-secondary mt-8" href={manifest.downloadPath} download>
                 Unduh template
               </a>
+            </div>
+          </div>
+        </section>
+
+        <section id="tentang" className="scroll-mt-8 border-b border-line py-16 lg:py-20">
+          <div className="wrap grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+            <div>
+              <p className="eyebrow">Tentang</p>
+              <h2 className="display mt-2 text-3xl sm:text-4xl">
+                Kenapa checker ini dibuat?
+              </h2>
+              <div className="mt-5 space-y-4 text-sm leading-relaxed text-muted">
+                <p>
+                  Tugas Excel biasanya dinilai dari hasil akhir. Padahal cara pekerjaan itu
+                  dibuat ikut penting: berapa lama dikerjakan, apakah isinya diedit atau
+                  ditempel, apakah file pernah kehilangan log, dan apakah ada beberapa file
+                  dengan isi yang sama persis.
+                </p>
+                <p>
+                  Checker ini dibuat untuk memberi dosen ringkasan bukti proses yang cepat
+                  dibaca, tanpa membuka file satu per satu. Mahasiswa memakai template tracker
+                  untuk merekam proses; dosen mengunggah file dan melihat mana yang perlu
+                  ditinjau.
+                </p>
+              </div>
+              <div className="mt-6 rounded-xl border border-amber/25 bg-amber-soft/60 p-4 text-sm">
+                <p className="font-semibold text-ink">Bukan penentu nilai.</p>
+                <p className="mt-1 text-muted">
+                  Flag NORMAL, CURIGA, TANPA LOG, atau GAGAL adalah penanda untuk diperiksa
+                  manusia, bukan kesimpulan otomatis. Keputusan tetap ada pada dosen.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted">
+                Dipakai untuk
+              </p>
+              <ul className="mt-4 space-y-3">
+                {useCases.map((item, index) => (
+                  <li key={item.title} className="card flex gap-4 p-4 sm:p-5">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-line-strong bg-surface-2 font-mono text-xs text-accent">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <div>
+                      <h3 className="font-semibold">{item.title}</h3>
+                      <p className="mt-1 text-sm text-muted">{item.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </section>

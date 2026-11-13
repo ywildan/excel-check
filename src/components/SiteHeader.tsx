@@ -34,6 +34,9 @@ export function SiteHeader() {
         </Link>
 
         <nav aria-label="Navigasi utama" className="flex flex-wrap items-center gap-1">
+          <Link className="nav-link" href="/#tentang">
+            Tentang
+          </Link>
           <Link className="nav-link" href="/#cara-pakai">
             Cara pakai
           </Link>
