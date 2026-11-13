@@ -5,17 +5,26 @@ export function SiteHeader() {
     <header className="border-t-4 border-accent bg-surface">
       <div className="wrap flex flex-col gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
         <Link href="/" className="flex items-center gap-3">
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-accent text-white">
-            <svg viewBox="0 0 32 32" width="20" height="20" fill="none" aria-hidden="true">
-              <path
-                d="M9 16.5l4.5 4.5L23 11"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
+          <svg
+            viewBox="0 0 512 512"
+            width="36"
+            height="36"
+            className="shrink-0 rounded-[10px]"
+            aria-hidden="true"
+          >
+            <rect width="512" height="512" rx="112" fill="#1e5947" />
+            <g
+              fill="none"
+              stroke="#FDFBF7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M196 128V384" strokeWidth="60" />
+              <path d="M196 256 344 128" strokeWidth="56" />
+              <path d="M196 256 344 384" strokeWidth="56" />
+            </g>
+            <circle cx="360" cy="392" r="20" fill="#FDFBF7" />
+          </svg>
           <span>
             <span className="block font-serif text-lg leading-tight">Checker Sikarsa</span>
             <span className="block text-[11px] uppercase tracking-[0.14em] text-muted">
