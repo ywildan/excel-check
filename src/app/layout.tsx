@@ -9,7 +9,11 @@ export const metadata: Metadata = {
   },
   description:
     "Alat bantu dosen memeriksa bukti pengerjaan tugas Excel. File diproses di browser dan tidak diunggah.",
-  icons: { icon: "/favicon.svg" },
+  icons: {
+    icon: [{ url: "/favicon-k.svg", type: "image/svg+xml" }],
+    shortcut: "/favicon-k.svg",
+    apple: "/favicon-k.svg",
+  },
 };
 
 export default function RootLayout({
