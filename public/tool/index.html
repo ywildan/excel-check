@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checker Audit Excel · Sikarsa</title>
+  <meta name="description" content="Alat bantu dosen memeriksa bukti pengerjaan tugas Excel. File diproses di browser.">
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/tool/style.css">
+</head>
+<body>
+  <nav class="app-nav" aria-label="Navigasi checker">
+    <div class="wrap">
+      <a class="app-brand" href="/">Checker Sikarsa</a>
+      <div class="app-links">
+        <span id="historyState" class="app-history" hidden></span>
+        <a href="/#template">Template</a>
+        <a id="historyLink" href="/masuk">Masuk</a>
+        <a href="/">Beranda</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="site-header">
+    <div class="wrap header-grid">
+      <div>
+        <p class="eyebrow">Alat bantu dosen · Pengantar Akuntansi</p>
+        <h1>Audit Tugas Excel</h1>
+        <p class="lede">Periksa bukti pengerjaan dari file <strong>.xlsm</strong> mahasiswa: waktu aktif, waktu diam, edit, paste, simpan, sheet/tabel, dan keutuhan log.</p>
+      </div>
+      <div class="privacy-note">
+        <span class="dot" aria-hidden="true"></span>
+        <p><strong>Diproses di browser.</strong><br>File tidak diunggah ke server.</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="steps" aria-label="Cara pakai">
+      <div class="step"><span>1</span><p>Buka halaman ini.</p></div>
+      <div class="step"><span>2</span><p>Tarik file <strong>.xlsm</strong> tracker tugas ke area unggah.</p></div>
+      <div class="step"><span>3</span><p>Baca flag dan bukti di dashboard.</p></div>
+    </section>
+
+    <section id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Unggah file tugas">
+      <input id="fileInput" type="file" accept=".xlsm,.xltm,.xlsx" multiple hidden>
+      <div class="drop-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" width="42" height="42" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M24 32V12m0 0-8 8m8-8 8 8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 30v4a4 4 0 0 0 4 4h20a4 4 0 0 0 4-4v-4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2>Tarik file tugas ke sini</h2>
+      <p>atau <button id="browseBtn" class="link-btn" type="button">pilih file</button> · bisa banyak file sekaligus</p>
+      <p class="hint">Format utama .xlsm. .xltm dan .xlsx juga diterima untuk file tanpa plugin.</p>
+    </section>
+
+    <div id="toolbar" class="toolbar" hidden>
+      <p id="fileCount" class="file-count"></p>
+      <div class="toolbar-actions">
+        <button id="csvBtn" class="btn ghost" type="button">Unduh CSV</button>
+        <button id="clearBtn" class="btn ghost danger" type="button">Hapus semua</button>
+      </div>
+    </div>
+
+    <section id="summary" class="summary-grid" aria-label="Ringkasan kelas" hidden>
+      <article class="stat stat-total"><span>Total file</span><strong id="statTotal">0</strong></article>
+      <article class="stat stat-normal"><span>NORMAL</span><strong id="statNormal">0</strong></article>
+      <article class="stat stat-curiga"><span>CURIGA</span><strong id="statCuriga">0</strong></article>
+      <article class="stat stat-tanpa"><span>TANPA LOG</span><strong id="statTanpa">0</strong></article>
+      <article class="stat stat-gagal"><span>GAGAL DIBACA</span><strong id="statGagal">0</strong></article>
+    </section>
+
+    <section id="pairsPanel" class="panel" hidden>
+      <div class="panel-head">
+        <h2>Kemungkinan salinan</h2>
+        <p class="panel-sub">Pasangan file dengan isi pekerjaan atau author yang sama.</p>
+      </div>
+      <div id="pairsList" class="pairs-list"></div>
+    </section>
+
+    <section id="resultsPanel" class="panel" hidden>
+      <div class="panel-head">
+        <h2>Hasil pemeriksaan</h2>
+        <div id="filters" class="filters" role="group" aria-label="Filter hasil">
+          <button class="filter is-active" data-filter="ALL" type="button">Semua</button>
+          <button class="filter" data-filter="NORMAL" type="button">Normal</button>
+          <button class="filter" data-filter="CURIGA" type="button">Curiga</button>
+          <button class="filter" data-filter="TANPA LOG" type="button">Tanpa log</button>
+          <button class="filter" data-filter="GAGAL" type="button">Gagal</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="resultsTable">
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Mahasiswa</th>
+              <th>Kelas</th>
+              <th>Aktif</th>
+              <th>Diam</th>
+              <th>Edit / Paste / Save</th>
+              <th>Sheet / Tabel</th>
+              <th>Log</th>
+              <th>Flag</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="detailPanel" class="detail" aria-live="polite" hidden></section>
+
+    <section id="emptyState" class="empty">
+      <p>Belum ada file. Mulai dengan mengunggah satu atau beberapa file .xlsm.</p>
+    </section>
+
+    <section class="honesty">
+      <h2>Batas alat ini</h2>
+      <p>Flag adalah petunjuk untuk dosen, bukan vonis otomatis. Hash log pada prototipe ini sederhana dan bukan tanda tangan digital resmi. Mahasiswa masih dapat menonaktifkan plugin, mengerjakan di file lain lalu paste di akhir, atau mengetik ulang hasil AI secara manual. Keputusan akhir tetap di tangan dosen.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Audit Excel · Format data: Audit_* + <span class="mono">_AUDIT_LOG</span> · Dibuat untuk tugas Pengantar Akuntansi.</p>
+    </div>
+  </footer>
+
+  <div id="busy" class="busy" hidden aria-live="polite">
+    <span class="spinner" aria-hidden="true"></span>
+    <p id="busyText">Memeriksa file...</p>
+  </div>
+
+  <script src="/tool/checker-core.js"></script>
+  <script src="/tool/checker.js"></script>
+  <script src="/tool/history-bridge.js"></script>
+</body>
+</html>

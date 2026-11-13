@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  accounts      Account[]
+  sessions      Session[]
+  checks        CheckRun[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @id
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model CheckRun {
+  id            String   @id @default(cuid())
+  userId        String
+  batchId       String?
+  fileName      String
+  fileSize      Int
+  fileSha256    String
+  nama          String?
+  nim           String?
+  kelas         String?
+  mataKuliah    String?
+  tugas         String?
+  activeSeconds Int      @default(0)
+  idleSeconds   Int      @default(0)
+  editCount     Int      @default(0)
+  pasteCount    Int      @default(0)
+  saveCount     Int      @default(0)
+  sheetCount    Int      @default(0)
+  tableCount    Int      @default(0)
+  cellCount     Int      @default(0)
+  logStatus     String
+  verdict       String
+  flags         Json
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([batchId])
+}
