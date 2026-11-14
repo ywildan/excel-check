@@ -1,3 +1,11 @@
+export type GeneratorManifest = {
+  name: string;
+  version: string;
+  size: number;
+  sha256: string;
+  updatedAt: string;
+};
+
 export type TemplateManifest = {
   name: string;
   version: string;
@@ -5,6 +13,7 @@ export type TemplateManifest = {
   sha256: string;
   updatedAt: string;
   downloadPath: string;
+  generator?: GeneratorManifest;
 };
 
 function formatSize(bytes: number) {
@@ -48,8 +57,8 @@ export function TemplateCard({ template }: { template: TemplateManifest }) {
           </div>
         </div>
 
-        <a className="btn btn-primary shrink-0" href={template.downloadPath} download>
-          Unduh template
+        <a className="btn btn-secondary shrink-0" href={template.downloadPath} download>
+          Unduh template langsung
           <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
             <path
               d="M10 3v9m0 0 3.5-3.5M10 12 6.5 8.5M4 15.5h12"

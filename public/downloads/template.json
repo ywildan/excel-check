@@ -4,5 +4,12 @@
   "size": 23758,
   "sha256": "f385538bf62fe3328caa10ed3ab29dd66a3b575ed5a80f8a3051656ae9138b0e",
   "updatedAt": "2026-11-14",
-  "downloadPath": "/downloads/Tracker_Audit_Tugas.xlsm"
+  "downloadPath": "/downloads/Tracker_Audit_Tugas.xlsm",
+  "generator": {
+    "name": "Tracker_Generator.bat",
+    "version": "1.0.0",
+    "size": 2111,
+    "sha256": "c6a2e081c8b91cb91cf0aab5732a8ad5019826055826aec20873df2934421c22",
+    "updatedAt": "2026-11-14"
+  }
 }

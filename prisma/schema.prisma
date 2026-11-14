@@ -51,6 +51,17 @@ model VerificationToken {
   @@id([identifier, token])
 }
 
+model TemplateDownload {
+  id        String   @id @default(cuid())
+  issuedId  String   @unique
+  source    String   @default("generator")
+  ipHash    String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 model CheckRun {
   id            String   @id @default(cuid())
   userId        String

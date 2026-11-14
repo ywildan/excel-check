@@ -23,8 +23,8 @@ const dosenSteps = [
 
 const mahasiswaSteps = [
   {
-    title: "Unduh satu file",
-    body: "Gunakan tracker resmi dari halaman ini. Jangan memakai file Excel pribadi.",
+    title: "Unduh Tracker Generator",
+    body: "Unduh generator sekali dari halaman ini, lalu jalankan setiap mulai tugas — file template baru langsung siap tanpa unblock. Jangan memakai file Excel pribadi.",
   },
   {
     title: "Isi identitas",
@@ -73,6 +73,14 @@ const faqs = [
     a: "Tidak. Checker menampilkan flag NORMAL, CURIGA, TANPA LOG, atau GAGAL untuk ditinjau dosen. Keputusan tetap ada pada dosen.",
   },
   {
+    q: "Kenapa file template yang diunduh kadang harus di-unblock dulu?",
+    a: "File yang diunduh lewat browser mendapatkan tanda 'dari internet' (Mark of the Web), dan Windows memblokir makro di file tersebut demi keamanan. Untuk melewati ini, pakai Tracker Generator di bawah: dia mengunduh template langsung sehingga file hasilnya tidak bertanda dan langsung bisa dipakai.",
+  },
+  {
+    q: "Apa bedanya Tracker Generator dengan unduh template biasa?",
+    a: "Unduhan biasa menghasilkan satu file yang perlu di-unblock sekali lewat Properties. Tracker Generator diunduh sekali, lalu setiap dijalankan menghasilkan file template baru yang langsung siap pakai di folder Tracker — selalu versi terbaru, tanpa langkah unblock.",
+  },
+  {
     q: "Kenapa tombol SELESAI berwarna merah?",
     a: "Sebagai peringatan bahwa setelah ditekan semua sheet dikunci dan file tidak bisa diedit lagi.",
   },
@@ -100,22 +108,17 @@ export default function HomePage() {
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link className="btn btn-primary" href="/mulai">
                   Mulai periksa
-                  <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
-                    <path
-                      d="M4 10h11m0 0-4-4m4 4-4 4"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
                 </Link>
-                <a className="btn btn-secondary" href={manifest.downloadPath} download>
-                  Unduh template mahasiswa
+                <a className="btn btn-secondary" href="/downloads/Tracker_Generator.bat" download>
+                  Unduh Tracker Generator
                 </a>
               </div>
 
               <div className="mt-10 flex flex-wrap gap-x-6 gap-y-2 border-t border-line pt-5 text-sm text-muted">
+                <a href={manifest.downloadPath} download className="underline-offset-2 hover:underline">
+                  Atau unduh template (.xlsm) — perlu Unblock di Properties
+                </a>
+                <span aria-hidden="true">·</span>
                 <span>Timer 1 detik</span>
                 <span aria-hidden="true">·</span>
                 <span>Semua sheet dan tabel</span>
@@ -154,14 +157,83 @@ export default function HomePage() {
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="eyebrow">Untuk mahasiswa</p>
-                <h2 className="display mt-2 text-3xl sm:text-4xl">Template tracker resmi</h2>
+                <h2 className="display mt-2 text-3xl sm:text-4xl">Tracker Generator</h2>
               </div>
               <p className="max-w-md text-sm text-muted">
-                Satu file, tanpa langkah pemasangan. Bagikan tautan halaman ini, bukan file
-                yang sudah terisi.
+                Unduh sekali, pakai berkali-kali. Setiap dijalankan menghasilkan file template
+                baru yang langsung siap pakai — tanpa langkah unblock, selalu versi terbaru.
               </p>
             </div>
-            <TemplateCard template={manifest} />
+
+            <article className="card mt-6 overflow-hidden">
+              <div className="flex flex-col gap-5 p-6 sm:flex-row sm:items-start sm:justify-between sm:p-8">
+                <div className="flex gap-4">
+                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-line bg-surface-2 text-accent">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
+                      <path
+                        d="M12 4.5v10m0 0 3.5-3.5M12 14.5 8.5 11M4.5 18.5h15"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <div>
+                    <h3 className="font-serif text-2xl leading-tight">
+                      Tracker Generator
+                      <span className="ml-2 align-middle text-xs font-sans font-semibold uppercase tracking-wide text-muted">
+                        Windows · unduh sekali
+                      </span>
+                    </h3>
+                    <p className="mt-3 max-w-lg text-sm text-muted">
+                      Butuh file baru untuk setiap tugas? Unduh generator ini{" "}
+                      <strong className="text-ink">sekali</strong>, simpan, lalu jalankan dengan
+                      double-click setiap kali mulai mengerjakan. Setiap klik menghasilkan file
+                      template baru di folder <code className="font-mono text-xs">Tracker</code>{" "}
+                      yang langsung siap dipakai — tanpa langkah unblock, dan selalu versi
+                      template terbaru.
+                    </p>
+                    <p className="mt-2 max-w-lg text-xs text-muted">
+                      Saat pertama kali dijalankan, Windows bisa menampilkan peringatan
+                      keamanan karena file diunduh dari internet — pilih <em>Run</em> untuk
+                      melanjutkan.
+                    </p>
+                  </div>
+                </div>
+
+                <a className="btn btn-primary shrink-0" href="/downloads/Tracker_Generator.bat" download>
+                  Unduh generator
+                  <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+                    <path
+                      d="M10 3v9m0 0 3.5-3.5M10 12 6.5 8.5M4 15.5h12"
+                      stroke="currentColor"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </a>
+              </div>
+              {manifest.generator && (
+                <div className="border-t border-line bg-surface-2 px-6 py-4 sm:px-8">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted">
+                    Generator v{manifest.generator.version} · SHA-256
+                  </p>
+                  <code className="mt-1 block break-all font-mono text-[11px] leading-relaxed text-muted">
+                    {manifest.generator.sha256}
+                  </code>
+                </div>
+              )}
+            </article>
+
+            <div className="mt-10">
+              <p className="text-sm text-muted">
+                Alternatif: unduh template langsung di bawah ini (perlu Unblock di Properties
+                setiap kali mengunduh).
+              </p>
+              <TemplateCard template={manifest} />
+            </div>
           </div>
         </section>
 
@@ -204,8 +276,8 @@ export default function HomePage() {
                   </li>
                 ))}
               </ol>
-              <a className="btn btn-secondary mt-8" href={manifest.downloadPath} download>
-                Unduh template
+              <a className="btn btn-secondary mt-8" href="/downloads/Tracker_Generator.bat" download>
+                Unduh Tracker Generator
               </a>
             </div>
           </div>

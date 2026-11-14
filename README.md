@@ -8,6 +8,14 @@ Checker Audit Excel untuk `checker.sikarsa.id`. Project ini **terpisah** dari
 - Landing page publik
 - Tool checker di `/mulai` (aset statis checker lama, analisis di browser)
 - Unduhan template di `/downloads/Tracker_Audit_Tugas.xlsm`
+- Endpoint `/api/template/baru`: mengirim template dengan ID unik (properti
+  `Audit_IssuedId` dan `Audit_IssuedAt` di `docProps/custom.xml`) dan mencatat
+  unduhan ke tabel `TemplateDownload` (best-effort; tanpa DB unduhan tetap berjalan)
+- Tracker Generator di `/downloads/Tracker_Generator.bat`: diunduh mahasiswa
+  sekali, lalu setiap dijalankan menghasilkan file template baru yang siap pakai.
+  Folder `%USERPROFILE%\Tracker` didaftarkan sebagai Trusted Location (HKCU,
+  tanpa admin) dan template diunduh via `curl.exe` sehingga tidak membawa Mark
+  of the Web (tidak perlu Unblock di Properties)
 - Login Google opsional untuk riwayat ringkasan
 - Halaman riwayat di `/riwayat`
 
@@ -68,7 +76,9 @@ Project memakai Prisma + Postgres (Neon / Vercel Postgres).
 npm run db:migrate
 ```
 
-Migrasi awal ada di `prisma/migrations/0001_init`. Untuk pengembangan:
+Migrasi awal ada di `prisma/migrations/0001_init`; migrasi tabel
+`TemplateDownload` ada di `prisma/migrations/0002_template_download`. Untuk
+pengembangan:
 
 ```bash
 npx prisma migrate dev
@@ -110,7 +120,11 @@ Template di `public/downloads/Tracker_Audit_Tugas.xlsm` memiliki tombol
 **SELESAI & KUNCI** berwarna merah. Metadata versi dan SHA-256 ada di
 `public/downloads/template.json` dan ditampilkan di landing page.
 
-Jika template diubah, perbarui versi, ukuran, hash, dan tanggal di manifest.
+Manifest yang sama juga melacak `Tracker_Generator.bat` di kunci `generator`
+(versi, ukuran, SHA-256); versi dan hash-nya ditampilkan di kartu generator.
+
+Jika template atau generator diubah, perbarui versi, ukuran, hash, dan tanggal
+di manifest.
 
 ## Batas
 
