@@ -559,6 +559,12 @@
     if (pluginPresent && activeSeconds === 0 && work.cells > 0) {
       add('curiga', 'Waktu aktif 0 detik tetapi sudah ada pekerjaan.');
     }
+    var editsPerMinute = activeSeconds > 0 ? (editCount * 60) / activeSeconds : 0;
+    if (pluginPresent && activeSeconds >= 30 && editCount >= 40 &&
+        work.cells >= 40 && pasteCount < 5 && editsPerMinute >= 70) {
+      add('curiga', 'Laju edit sangat tinggi: ' + editCount + ' edit untuk ' + work.cells +
+        ' sel dalam ' + activeSeconds + ' detik (~' + Math.round(editsPerMinute) + ' edit/menit).');
+    }
     var activityCells = formulaCount + valueCount;
     var pasteShare = activityCells > 0 ? pasteCells / activityCells : 0;
     if (pluginPresent && (pasteCells >= 100 || (pasteCells >= 30 && pasteShare >= 0.5) || pasteCount >= 10)) {
