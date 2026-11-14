@@ -10,6 +10,9 @@
   'use strict';
 
   var decoder = new TextDecoder('utf-8', { fatal: false });
+  var MAX_FILE_BYTES = 30 * 1024 * 1024;
+  var MAX_TOTAL_UNCOMPRESSED = 120 * 1024 * 1024;
+  var MAX_ENTRIES = 4000;
 
   /* ---------------- ZIP ---------------- */
 
@@ -25,6 +28,7 @@
   async function unzip(bytes) {
     if (!(bytes instanceof Uint8Array)) bytes = new Uint8Array(bytes);
     if (bytes.length < 22) throw new Error('File terlalu kecil / bukan XLSM.');
+    if (bytes.length > MAX_FILE_BYTES) throw new Error('File terlalu besar (maks 30 MB).');
     var dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
     var eocd = -1;
     var min = Math.max(0, bytes.length - 65557);
@@ -35,12 +39,14 @@
     var count = dv.getUint16(eocd + 10, true);
     var cdOffset = dv.getUint32(eocd + 16, true);
     if (count === 0xffff || cdOffset === 0xffffffff) throw new Error('ZIP64 belum didukung.');
+    if (count > MAX_ENTRIES) throw new Error('Jumlah entry ZIP terlalu banyak.');
     var p = cdOffset;
     var entries = new Map();
     for (var n = 0; n < count; n++) {
       if (dv.getUint32(p, true) !== 0x02014b50) throw new Error('Central directory ZIP rusak.');
       var method = dv.getUint16(p + 10, true);
       var csize = dv.getUint32(p + 20, true);
+      var usize = dv.getUint32(p + 24, true);
       var nameLen = dv.getUint16(p + 28, true);
       var extraLen = dv.getUint16(p + 30, true);
       var commentLen = dv.getUint16(p + 32, true);
@@ -49,16 +55,30 @@
       if (dv.getUint32(localOff, true) !== 0x04034b50) throw new Error('Local header ZIP rusak.');
       var lNameLen = dv.getUint16(localOff + 26, true);
       var lExtraLen = dv.getUint16(localOff + 28, true);
-      entries.set(name, { method: method, csize: csize, start: localOff + 30 + lNameLen + lExtraLen });
+      entries.set(name, {
+        method: method,
+        csize: csize,
+        usize: usize,
+        start: localOff + 30 + lNameLen + lExtraLen
+      });
       p += 46 + nameLen + extraLen + commentLen;
     }
     var files = new Map();
+    var total = 0;
     for (var pair of entries) {
       var nm = pair[0], e = pair[1];
+      if (e.start + e.csize > bytes.length) throw new Error('Entry ZIP melewati batas file.');
+      if (e.usize > MAX_TOTAL_UNCOMPRESSED || total + e.usize > MAX_TOTAL_UNCOMPRESSED) {
+        throw new Error('Isi file terlalu besar setelah dibuka.');
+      }
       var raw = bytes.subarray(e.start, e.start + e.csize);
-      if (e.method === 0) files.set(nm, raw);
-      else if (e.method === 8) files.set(nm, await inflateRaw(raw));
+      var data;
+      if (e.method === 0) data = raw;
+      else if (e.method === 8) data = await inflateRaw(raw);
       else throw new Error('Metode kompresi tidak didukung: ' + e.method);
+      total += data.length;
+      if (total > MAX_TOTAL_UNCOMPRESSED) throw new Error('Isi file terlalu besar setelah dibuka.');
+      files.set(nm, data);
     }
     return files;
   }
@@ -555,6 +575,46 @@
       if (mm && identity.nim && mm[1].trim() !== identity.nim) {
         add('curiga', 'NIM di log MULAI (' + mm[1] + ') berbeda dengan identitas (' + identity.nim + ').');
       }
+      var awal = /SelAwal=(\d+)/.exec(mulaiRow.detail);
+      if (awal && Number(awal[1]) > 0) {
+        add('curiga', 'Sudah ada ' + awal[1] + ' sel terisi sebelum TRACK START.');
+      }
+    }
+
+    var selesaiRow = null;
+    for (var sIdx = logRows.length - 1; sIdx >= 0; sIdx--) {
+      if (logRows[sIdx].event === 'SELESAI') { selesaiRow = logRows[sIdx]; break; }
+    }
+    if (selesaiRow) {
+      var sm = /Aktif=(\d+)\s*dtk;\s*Diam=(\d+)\s*dtk;\s*Edit=(\d+);\s*Paste=(\d+);\s*Save=(\d+);\s*Sheet=(\d+);\s*Tabel=(\d+);\s*Sel=(\d+)/.exec(selesaiRow.detail);
+      if (sm) {
+        var beda = [];
+        [
+          ['aktif', sm[1], activeSeconds],
+          ['diam', sm[2], idleSeconds],
+          ['edit', sm[3], editCount],
+          ['paste', sm[4], pasteCount],
+          ['save', sm[5], saveCount],
+          ['sheet', sm[6], numProp('Audit_SheetCount')],
+          ['tabel', sm[7], numProp('Audit_TableCount')],
+          ['sel', sm[8], numProp('Audit_CellCount')]
+        ].forEach(function (pair) {
+          if (Number(pair[1]) !== Number(pair[2])) {
+            beda.push(pair[0] + ': log=' + pair[1] + ', properti=' + pair[2]);
+          }
+        });
+        if (beda.length) {
+          add('curiga', 'Angka properti berbeda dari log SELESAI (' + beda.join('; ') + ').');
+        }
+      }
+    }
+
+    if (started && work.cells === 0) {
+      if (finished) {
+        add('curiga', 'Tidak ada pekerjaan terdeteksi: tidak ada sel terisi di sheet kerja.');
+      } else {
+        add('info', 'Belum ada pekerjaan di sheet kerja.');
+      }
     }
     if (!identity.nama || !identity.nim) add('info', 'Identitas Nama/NIM belum lengkap di properti/file.');
     if (journal && journal.selisih !== 0) {
@@ -694,6 +754,10 @@
     for (var i = 0; i < items.length; i++) {
       var it = items[i];
       try {
+        var size = it.buffer && it.buffer.byteLength ? it.buffer.byteLength : 0;
+        if (size > MAX_FILE_BYTES) {
+          throw new Error('File terlalu besar (maks 30 MB).');
+        }
         files.push(await analyzeWorkbook(it.buffer, it.name));
       } catch (err) {
         files.push({

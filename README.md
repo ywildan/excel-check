@@ -115,5 +115,7 @@ Jika template diubah, perbarui versi, ukuran, hash, dan tanggal di manifest.
 ## Batas
 
 - Analisis file bergantung pada browser modern (ZIP + `DecompressionStream`).
+- File dibatasi 30 MB dan total isi ZIP 120 MB.
+- Checker menandai sel yang sudah terisi sebelum TRACK START, perbedaan angka properti vs log SELESAI, dan pekerjaan kosong.
 - Login dan riwayat belum diuji dengan kredensial Google/Postgres asli.
 - Checker memberi flag untuk ditinjau, bukan nilai otomatis.
